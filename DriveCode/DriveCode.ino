@@ -53,8 +53,15 @@ void setup() {
 }
 
 void loop() {
-
+  // delay(1000);
   drive.setSpeed(150);
+  delay(10000);
+  drive.setSpeed(-150);
+  delay(10000);
+  // digitalWrite(13, HIGH);
+  // delay(1000);
+  // drive.setSpeed(-150);
+  // digitalWrite(13, LOW);
   // put your main code here, to run repeatedly:
 
 }
