@@ -11,7 +11,7 @@ class L298N{ //custom L298N motor driver object.
       braking = brake;
 
     }
-    void setSpeed(int speed = 0){
+    void setSpeed(double speed = 0){
       if(speed == 0 && braking){
         digitalWrite(in1, HIGH);
         digitalWrite(in1, HIGH);
@@ -25,12 +25,12 @@ class L298N{ //custom L298N motor driver object.
       else if(speed > 0){
         digitalWrite(in1, HIGH);
         digitalWrite(in2, LOW);
-        analogWrite(ena, speed);
+        analogWrite(ena, speed*255);
       }
       else if(speed < 0){
         digitalWrite(in1, LOW);
         digitalWrite(in2, HIGH);
-        analogWrite(ena, speed*-1);
+        analogWrite(ena, speed*-255);
       }
     }
 };

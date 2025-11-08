@@ -26,7 +26,8 @@ void setup() {
 }
 
 void loop() {
- Serial.println(result.State());
- delay(500);
+
+  Serial.println(result.State());
+  delay(500);
 
 }
