@@ -58,12 +58,12 @@ class L298N{ //custom L298N motor driver object.
     void setSpeed(double speed = 0){
       if(speed == 0 && braking){
         digitalWrite(in1, HIGH);
-        digitalWrite(in1, HIGH);
+        digitalWrite(in2, HIGH);
         digitalWrite(ena, LOW);
       }
       else if(speed == 0 && !braking){
         digitalWrite(in1, LOW);
-        digitalWrite(in1, LOW);
+        digitalWrite(in2, LOW);
         digitalWrite(ena, LOW);
       }
       else if(speed > 0){
