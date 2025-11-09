@@ -1,3 +1,4 @@
+#include <math.h>
 class Switch{
   int pin;
   bool inverted;
@@ -27,10 +28,12 @@ class UltrasonicSensor{
     UltrasonicSensor(int trigpin, int echopin){
       trigPin = trigpin;
       echoPin = echopin;
+    }
+    void init(){
       pinMode(echoPin, INPUT);
       pinMode(trigPin, OUTPUT);
     }
-    int Distance(){ 
+    float Distance(){ 
       digitalWrite(trigPin, LOW);
       delayMicroseconds(2);
       digitalWrite(trigPin,  HIGH);
@@ -54,6 +57,11 @@ class L298N{ //custom L298N motor driver object.
       in2 = in2Pin;
       braking = brake;
 
+    }
+    void init(){
+      pinMode(ena, OUTPUT);
+      pinMode(in1, OUTPUT);
+      pinMode(in2, OUTPUT);
     }
     void setSpeed(double speed = 0){
       if(speed == 0 && braking){
@@ -206,7 +214,7 @@ class MotionMagic7 {
           if (Dabs < Dmin) {
               // tiny move: reduce peak accel to fit distance, triangular S-curve
               // Dabs = 2 * A'^3 / J^2  ->  A' = cbrt( Dabs * J^2 / 2 )
-              float Apeak = powf(Dabs * J*J / 2.0f, 1.0f/3.0f);
+              float Apeak = pow(Dabs * J*J / 2.0f, 1.0f/3.0f);
               float tJ = Apeak / J;
 
               t1 = tJ; t2 = 0; t3 = tJ;
@@ -271,7 +279,7 @@ class MotionMagic7 {
                   float c0 = (A*A*A) / (J*J) - 0.5f * Dabs;
                   float disc = c1*c1 - 4.0f*c2*c0;
                   if (disc < 0.0f) disc = 0.0f;
-                  float t2_sol = (-c1 + sqrtf(disc)) / (2.0f*c2);
+                  float t2_sol = (-c1 + sqrt(disc)) / (2.0f*c2);
                   if (t2_sol < 0.0f) t2_sol = 0.0f;
 
                   t1 = tJ;
@@ -370,6 +378,9 @@ MotionMagic7 Pid(0.1, 0, 0, 0);
 
 void setup() {
   Pid.setConstraints(100, 100, 100);
+  drive.init();
+  launch.init();
+  sensor.init();
   // put your setup code here, to run once:
 
 }
@@ -381,22 +392,29 @@ const float returnDriveT = 40;
 const float acceptableError = 3;
 
 
+const float shootingT = 12;
+
+const float shootingAcceptableError = 2;
+
+const float shooterPower = 0.5;
+
+
 void loop() {
   
   if(mode.State()){
     //drive code
     delay(1000);
-    Pid.setTarget(initDriveT, sensor.Distance());
     float time = millis() / 1000.0f;
+    Pid.setTarget(initDriveT, sensor.Distance());
 
-    while(abs(sensor.Distance()-initDriveT)>acceptableError){
+    while(fabs(sensor.Distance()-initDriveT)>acceptableError){
       float output = -Pid.update(sensor.Distance(), (millis()/1000.0f)-time);
       time = millis()/1000.0f;
       drive.setSpeed(output);
     }
     Pid.setTarget(returnDriveT, sensor.Distance());
     time = millis() / 1000.0f;
-    while(abs(sensor.Distance()-returnDriveT)>acceptableError){
+    while(fabs(sensor.Distance()-returnDriveT)>acceptableError){
       float output = -Pid.update(sensor.Distance(), (millis()/1000.0f)-time);
       time = millis()/1000.0f;
       drive.setSpeed(output);
@@ -405,6 +423,21 @@ void loop() {
 
   }
   else{
+    delay(1000);
+    float time = millis()/1000.0f;
+    Pid.setTarget(shootingT, sensor.Distance());
+
+    while(fabs(sensor.Distance()-shootingT)>shootingAcceptableError){
+      float output = -Pid.update(sensor.Distance(), (millis()/1000.0f)-time);
+      time = millis()/1000.0f;
+      drive.setSpeed(output);
+    }
+    launch.setSpeed(shooterPower);
+    while(!limit.State()){
+      continue;
+    }
+    launch.setSpeed();
+
     // Launch Code
   }
   return;
