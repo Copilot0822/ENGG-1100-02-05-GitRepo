@@ -378,6 +378,8 @@ const float initDriveT = 12;
 
 const float returnDriveT = 40;
 
+const float acceptableError = 3;
+
 
 void loop() {
   
@@ -385,12 +387,25 @@ void loop() {
     //drive code
     delay(1000);
     Pid.setTarget(initDriveT, sensor.Distance());
-    while(abs(sensor.Distance()-initDriveT)){
-      
+    float time = millis() / 1000.0f;
+
+    while(abs(sensor.Distance()-initDriveT)>acceptableError){
+      float output = -Pid.update(sensor.Distance(), (millis()/1000.0f)-time);
+      time = millis()/1000.0f;
+      drive.setSpeed(output);
     }
+    Pid.setTarget(returnDriveT, sensor.Distance());
+    time = millis() / 1000.0f;
+    while(abs(sensor.Distance()-returnDriveT)>acceptableError){
+      float output = -Pid.update(sensor.Distance(), (millis()/1000.0f)-time);
+      time = millis()/1000.0f;
+      drive.setSpeed(output);
+    }
+    
 
   }
   else{
     // Launch Code
   }
+  return;
 }
