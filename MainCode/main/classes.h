@@ -90,6 +90,7 @@ class L298N{
       }
     }
 };
+
 class MotionMagic7 {
   public:
       MotionMagic7(float kP, float kI, float kD, float kF)
