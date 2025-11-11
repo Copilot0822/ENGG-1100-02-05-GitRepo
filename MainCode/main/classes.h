@@ -30,7 +30,7 @@ class UltrasonicSensor{
   int trigPin;
   int echoPin;
   long duration;
-  int distance;
+  float distance;
   
   public:
     UltrasonicSensor(int trigpin, int echopin){
@@ -48,7 +48,7 @@ class UltrasonicSensor{
       delayMicroseconds(10);
       digitalWrite(trigPin, LOW);
       duration  = pulseIn(echoPin, HIGH);
-      distance= duration*0.034/2;
+      distance= duration*0.034f/2.0f;
       return distance;
     }
 };
