@@ -4,13 +4,13 @@
 Switch limit(2);
 Switch mode(4);
 Switch power(6);
-
+ 
 UltrasonicSensor sensor(10, 11);
 
 L298N drive(3, 7, 8);
 L298N launch(5, 12, 13);
 
-MotionMagic7 Pid(0.1, 0, 0, 0);
+MotionMagic7 Pid(0.01, 0, 0, 0);
 
 // Pid.setConstraints(100,100,100);
 
@@ -31,14 +31,14 @@ void setup() {
 
 }
 
-const float initDriveT = 12;
+const float initDriveT = 3;
 
 const float returnDriveT = 40;
 
-const float acceptableError = 3;
+const float acceptableError = 1;
 
 
-const float shootingT = 12;
+const float shootingT = 3;
 
 const float shootingAcceptableError = 2;
 
@@ -50,7 +50,10 @@ void loop() {
 
   if(!power.State()){
     Serial.print("distance: ");
-    Serial.println(sensor.Distance());
+    Serial.print(sensor.Distance());
+    Serial.print("  ");
+    Serial.println(mode.State());
+
     ShootStage = 0;
     DriveStage = 0; 
     delay(100);
@@ -71,7 +74,11 @@ void loop() {
       }
       else if(DriveStage == 2){
         //pid loop
-        float output = -Pid.update(sensor.Distance(), (millis()/1000.0f)-time);
+        float output = Pid.update(sensor.Distance(), (millis()/1000.0f)-time);
+        Serial.print(output);
+        Serial.print("  ");
+        Serial.println(sensor.Distance());
+
         time = millis()/1000.0f;
         drive.setSpeed(output);
         if(!(fabs(sensor.Distance()-initDriveT)>acceptableError)){
