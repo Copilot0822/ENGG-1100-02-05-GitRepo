@@ -10,7 +10,7 @@ UltrasonicSensor sensor(10, 11);
 L298N drive(3, 7, 8);
 L298N launch(5, 12, 13);
 
-MotionMagic7 Pid(0.01, 0, 0, 0);
+MotionMagic7 Pid(1, 0, 0, 0);
 
 // Pid.setConstraints(100,100,100);
 
@@ -74,7 +74,7 @@ void loop() {
       }
       else if(DriveStage == 2){
         //pid loop
-        float output = Pid.update(sensor.Distance(), (millis()/1000.0f)-time);
+        float output = Pid.update(sensor.Distance()/100, (millis()/1000.0f)-time);
         Serial.print(output);
         Serial.print("  ");
         Serial.println(sensor.Distance());
