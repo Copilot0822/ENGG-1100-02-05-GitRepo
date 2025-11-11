@@ -12,6 +12,9 @@ class Switch{
     Switch(int Pin, bool Invert = false){
       pin = Pin;
       inverted = Invert;
+      // pinMode(pin, INPUT_PULLUP);
+    }
+    void init(){
       pinMode(pin, INPUT_PULLUP);
     }
     bool State(){

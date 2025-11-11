@@ -3,6 +3,7 @@
 
 Switch limit(2);
 Switch mode(4);
+Switch power(6);
 
 UltrasonicSensor sensor(10, 11);
 
@@ -19,6 +20,12 @@ void setup() {
   drive.init();
   launch.init();
   sensor.init();
+
+  limit.init();
+  mode.init();
+  power.init();
+
+  Serial.begin(9600);
   // put your setup code here, to run once:
 
 }
@@ -38,7 +45,12 @@ const float shooterPower = 0.5;
 
 
 void loop() {
-  
+
+  if(!power.State()){
+    Serial.print("distance: ");
+    Serial.println(sensor.Distance());
+    delay(100);
+  }
   if(mode.State()){
     //drive code
     delay(1000);
