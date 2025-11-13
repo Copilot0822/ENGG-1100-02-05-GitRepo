@@ -31,16 +31,16 @@ void setup() {
 
 }
 
-const float initDriveT = 3;
+const float initDriveT = 0.03;
 
-const float returnDriveT = 40;
+const float returnDriveT = 0.4;
 
-const float acceptableError = 1;
+const float acceptableError = 0.01;
 
 
-const float shootingT = 3;
+const float shootingT = 0.03;
 
-const float shootingAcceptableError = 2;
+const float shootingAcceptableError = 0.02;
 
 const float shooterPower = 0.5;
 
@@ -48,9 +48,16 @@ float time;
 
 void loop() {
 
+  float distance = sensor.Distance()/100.0f;
+
+  // time = millis()/1000.0f;
+
+
   if(!power.State()){
+    drive.setSpeed();
+    launch.setSpeed();
     Serial.print("distance: ");
-    Serial.print(sensor.Distance());
+    Serial.print(distance);
     Serial.print("  ");
     Serial.println(mode.State());
 
@@ -69,35 +76,36 @@ void loop() {
       else if(DriveStage ==1){
         //pid setup
         time = millis() / 1000.0f;
-        Pid.setTarget(initDriveT, sensor.Distance());
+        Pid.setTarget(initDriveT, distance);
         DriveStage++;
       }
       else if(DriveStage == 2){
         //pid loop
-        float output = Pid.update(sensor.Distance()/100, (millis()/1000.0f)-time);
+        float output = -Pid.update(distance, (millis()/1000.0f)-time);
+        time = millis()/1000.0f;
         Serial.print(output);
         Serial.print("  ");
-        Serial.println(sensor.Distance());
+        Serial.println(distance);
 
         time = millis()/1000.0f;
         drive.setSpeed(output);
-        if(!(fabs(sensor.Distance()-initDriveT)>acceptableError)){
+        if(!(fabs(distance-initDriveT)>acceptableError)){
           DriveStage++;
           drive.setSpeed();
         }
       }
       else if(DriveStage == 3){
         // pid2 init
-        Pid.setTarget(returnDriveT, sensor.Distance());
+        Pid.setTarget(returnDriveT, distance);
         time = millis() / 1000.0f;
         DriveStage++;
       }
       else if(DriveStage == 4){
         // pid2 loop
-        float output = -Pid.update(sensor.Distance(), (millis()/1000.0f)-time);
+        float output = -Pid.update(distance, (millis()/1000.0f)-time);
         time = millis()/1000.0f;
         drive.setSpeed(output);
-        if(!(fabs(sensor.Distance()-returnDriveT)>acceptableError)){
+        if(!(fabs(distance-returnDriveT)>acceptableError)){
           DriveStage++;
           drive.setSpeed();
         }
@@ -135,14 +143,14 @@ void loop() {
       
       else if(ShootStage == 1){
         time = millis()/1000.0f;
-        Pid.setTarget(shootingT, sensor.Distance());
+        Pid.setTarget(shootingT, distance);
         ShootStage++;
       }
       else if(ShootStage == 2){
-        float output = -Pid.update(sensor.Distance(), (millis()/1000.0f)-time);
+        float output = -Pid.update(distance, (millis()/1000.0f)-time);
         time = millis()/1000.0f;
         drive.setSpeed(output);
-        if(!(fabs(sensor.Distance()-shootingT)>shootingAcceptableError)){
+        if(!(fabs(distance-shootingT)>shootingAcceptableError)){
           ShootStage++;
           drive.setSpeed();
         }
