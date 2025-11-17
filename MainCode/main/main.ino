@@ -10,14 +10,14 @@ UltrasonicSensor sensor(10, 11);
 L298N drive(3, 7, 8);
 L298N launch(5, 12, 13);
 
-MotionMagic7 Pid(1, 0, 0, 0);
+MotionMagic7 Pid(4, 0.8, 0, 0);
 
 // Pid.setConstraints(100,100,100);
 
 int DriveStage = 0;
 int ShootStage = 0;
 void setup() {
-  Pid.setConstraints(100, 100, 100);
+  Pid.setConstraints(1, 1, 1);
   drive.init();
   launch.init();
   sensor.init();
@@ -31,11 +31,11 @@ void setup() {
 
 }
 
-const float initDriveT = 0.03;
+const float initDriveT = 0.20;
 
-const float returnDriveT = 0.4;
+const float returnDriveT = 1;
 
-const float acceptableError = 0.01;
+const float acceptableError = 0.03;
 
 
 const float shootingT = 0.03;
@@ -45,6 +45,8 @@ const float shootingAcceptableError = 0.02;
 const float shooterPower = 0.5;
 
 float time;
+
+int countOut = 0;
 
 void loop() {
 
@@ -60,6 +62,7 @@ void loop() {
     Serial.print(distance);
     Serial.print("  ");
     Serial.println(mode.State());
+    drive.setSpeed(0);
 
     ShootStage = 0;
     DriveStage = 0; 
@@ -67,6 +70,7 @@ void loop() {
   }
   else{
     if(mode.State()){
+      
       //drive code
       ShootStage = 0;
       if(DriveStage ==0){
@@ -78,37 +82,58 @@ void loop() {
         time = millis() / 1000.0f;
         Pid.setTarget(initDriveT, distance);
         DriveStage++;
+        countOut = 0;
       }
+      
       else if(DriveStage == 2){
         //pid loop
-        float output = -Pid.update(distance, (millis()/1000.0f)-time);
+        // if(!distance>5){
+        //   float output = -Pid.update(distance, (millis()/1000.0f)-time);
+        // }
+        // float output = -Pid.update(distance, (millis()/1000.0f)-time);
+        float output = max(-0.5f, min(-Pid.update(distance, (millis()/1000.0f)-time), 0.5f));
+
         time = millis()/1000.0f;
         Serial.print(output);
-        Serial.print("  ");
+        Serial.print(" h ");
         Serial.println(distance);
 
         time = millis()/1000.0f;
         drive.setSpeed(output);
         if(!(fabs(distance-initDriveT)>acceptableError)){
+          // DriveStage++;
+          // drive.setSpeed();
+          countOut ++;
+        }
+        if(countOut > 10){
           DriveStage++;
           drive.setSpeed();
         }
+
       }
       else if(DriveStage == 3){
         // pid2 init
+        countOut = 0;
         Pid.setTarget(returnDriveT, distance);
         time = millis() / 1000.0f;
         DriveStage++;
       }
       else if(DriveStage == 4){
         // pid2 loop
-        float output = -Pid.update(distance, (millis()/1000.0f)-time);
+        // float output = -Pid.update(distance, (millis()/1000.0f)-time);
+        float output = max(-0.5f, min(-Pid.update(distance, (millis()/1000.0f)-time), 0.5f));
         time = millis()/1000.0f;
         drive.setSpeed(output);
         if(!(fabs(distance-returnDriveT)>acceptableError)){
+          // DriveStage++;
+          // drive.setSpeed();
+          countOut++;
+        }
+        if(countOut >10){
           DriveStage++;
           drive.setSpeed();
         }
+
       }
       else{
         Serial.println("Done driving!");
