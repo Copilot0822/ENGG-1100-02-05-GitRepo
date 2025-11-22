@@ -10,7 +10,7 @@ UltrasonicSensor sensor(10, 11);
 L298N drive(3, 7, 8);
 L298N launch(5, 12, 13);
 
-MotionMagic7 Pid(4, 0.8, 0, 0);
+MotionMagic7 Pid(4, 0.1, 0, 0);
 
 // Pid.setConstraints(100,100,100);
 
@@ -31,9 +31,9 @@ void setup() {
 
 }
 
-const float initDriveT = 0.20;
+const float initDriveT = 0.36;
 
-const float returnDriveT = 1;
+const float returnDriveT = 11.87;
 
 const float acceptableError = 0.03;
 

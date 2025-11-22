@@ -43,15 +43,15 @@ public:
 };
 
 // pin assignment
-int ena = 3;
-int in1 = 4;
-int in2 = 5;
+int ena = 5;
+int in1 = 12;
+int in2 = 13;
 L298N drive(ena, in1, in2, false); // object init, (enablePin, in1, in2, brakingMode)
 void setup() {}
 void loop()
 {
-  drive.setSpeed(-255); // set speed to go forward, (speed), speed>0 for forward, speed<0 for backwards
-  delay(10000);         // 10s delay
-  drive.setSpeed(255);  // backwards command
-  delay(10000);         // 10s delay
+  drive.setSpeed(255); // set speed to go forward, (speed), speed>0 for forward, speed<0 for backwards
+  // delay(10000);         // 10s delay
+  // drive.setSpeed(255);  // backwards command
+  // delay(10000);         // 10s delay
 }
