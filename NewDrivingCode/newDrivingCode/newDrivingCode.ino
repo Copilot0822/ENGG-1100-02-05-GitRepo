@@ -1,5 +1,5 @@
 
-#include "classes.h"
+#include "classes.h"//includes the classes header file for all of the objects used
 
 L298N drive(5,2,4);//creates the drivetrain motor controller, the numbers are the pins, 5:enable, 2:in1, 4:in2
 
