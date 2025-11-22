@@ -1,6 +1,8 @@
+/*
+  This header file's contents were developed in part by Hong Yuet, Cheng (1375779) and Benjamin McRae (1379397)
+  This header file was authored, implemented and documented by Benjamin McRae (1379397)
 
-
-
+*/
 
 #ifndef CLASSES_H
 #define CLASSES_H
@@ -8,20 +10,27 @@
 #include <Arduino.h>
 #include <math.h>
 
+
+/*
+  This Object was authored by Hong Yuet, Cheng (1375779)
+  Documented by Benjamin McRae (1379397)
+
+  The `Switch` Object was designed for the use of a switch or button.
+
+*/
 class Switch{
   int pin;
   bool inverted;
 
   public:
-    Switch(int Pin, bool Invert = false){
+    Switch(int Pin, bool Invert = false){//the declaration method: contains the ease of invertion input and pin 
       pin = Pin;
       inverted = Invert;
-      // pinMode(pin, INPUT_PULLUP);
     }
-    void init(){
+    void init(){// `init` is used for the pinmode setup and MUST be used in the setup or main loop BEFORE use
       pinMode(pin, INPUT_PULLUP);
     }
-    bool State(){
+    bool State(){// `State` returns the logical switch state, taking into account whether the switch is configured inverted or not
       if(inverted){
         return digitalRead(pin) == LOW;
       } else {
@@ -30,6 +39,14 @@ class Switch{
     }
 };
 
+
+
+/*
+  This Object was authored by Hong Yuet, Cheng (1375779)
+  Documented by Benjamin McRae (1379397)
+
+  The `UltrasonicSensor` Object was designed for use with the provided HC-SR04 ultrasonic sensor wired directly to the Arduino 
+*/
 class UltrasonicSensor{
   int trigPin;
   int echoPin;
@@ -37,15 +54,15 @@ class UltrasonicSensor{
   float distance;
   
   public:
-    UltrasonicSensor(int trigpin, int echopin){
+    UltrasonicSensor(int trigpin, int echopin){//The declaration method takes in the trigger and echo pin as integers
       trigPin = trigpin;
       echoPin = echopin;
     }
-    void init(){
+    void init(){// `init` is used for the pinmode setup and MUST be used in the setup or main loop BEFORE use
       pinMode(echoPin, INPUT);
       pinMode(trigPin, OUTPUT);
     }
-    float Distance(){ 
+    float Distance(){//`Distance` returns the distance measured by the sensor in cm. When being used this method takes time, only do once per loop where possible
       digitalWrite(trigPin, LOW);
       delayMicroseconds(2);
       digitalWrite(trigPin,  HIGH);
@@ -57,24 +74,31 @@ class UltrasonicSensor{
     }
 };
 
+
+/*
+  This Object was authored and documented by Benjamin McRae (1379397)
+
+  The `L298N` Object was designed for use with the provided L298N breakout board or other h bridge 
+  motor controllers with the same control configuration
+*/
 class L298N{
   int ena;
   int in1;
   int in2;
   bool braking;
   public:
-    L298N(int enPin, int in1Pin, int in2Pin, bool brake = true){
+    L298N(int enPin, int in1Pin, int in2Pin, bool brake = true){//The declaration method takes in the pins required for control and whether braking mode should be turned on when speed is set to 0
       ena = enPin;
       in1 = in1Pin;
       in2 = in2Pin;
       braking = brake;
     }
-    void init(){
+    void init(){// `init` is used for the pinmode setup and MUST be used in the setup or main loop BEFORE use
       pinMode(ena, OUTPUT);
       pinMode(in1, OUTPUT);
       pinMode(in2, OUTPUT);
     }
-    void setSpeed(double speed = 0){
+    void setSpeed(double speed = 0){// `setSpeed` is used to set the output of the motor controller, the input is [-1, 1], notice that any other input will result in the closest limit being the output, providing no value will output zero output 
       if(speed == 0 && braking){
         digitalWrite(in1, HIGH);
         digitalWrite(in2, HIGH);
@@ -97,7 +121,9 @@ class L298N{
       }
     }
 };
-
+/*
+  This object was authored and documented by Benjamin McRae (1379397) in 2024 to emulate FRC CTRE MotionMagic but on Arduino.
+*/
 class MotionMagic7 {
   public:
       MotionMagic7(float kP, float kI, float kD, float kF)
