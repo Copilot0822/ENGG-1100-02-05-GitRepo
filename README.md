@@ -4,8 +4,8 @@ Arduino codebase for an autonomous drive-and-launch system built around an ultra
 
 The repository contains two main operating modes:
 
-- **Drive Mode** – autonomously drives to a target distance and performs a return run.
-- **Launch Mode** – drives to a target distance from a wall/target, then spins up a launcher motor.
+- **Drive Mode** – for the driving run in the performance test
+- **Launch Mode** – for the launching run in the performance test
 
 Both modes share a common support library defined in `classes.h`.
 
@@ -30,7 +30,7 @@ The two `classes.h` files are identical and provide all reusable components (sen
 
 ## Hardware Overview
 
-The sketches assume an Arduino-compatible board with:
+The sketches assume an Arduino Uno with:
 
 - **H-bridge motor driver (L298N or similar)**  
   - Drive motor:
@@ -44,7 +44,7 @@ The sketches assume an Arduino-compatible board with:
 - **Ultrasonic distance sensor** (e.g., HC-SR04):
   - Trigger: **D11**
   - Echo: **D10**
-- Optional switches (supported by `Switch` class, not used in current `.ino` files).
+- Optional switches (supported by `Switch` class, not used in current `.ino` files). Was deprecated because the switch wiring was deemed un reliable
 
 Pin assignments can be changed by editing the object constructions at the top of each `.ino` file.
 
@@ -131,7 +131,7 @@ In `setup()`:
 
 - `drive.init();`
 - `sensor.init();`
-- `Pid.setConstraints(100, 100, 100);`  // max velocity, acceleration, jerk (units are user-defined)
+- `Pid.setConstraints(100, 100, 100);`  // max velocity, acceleration, jerk (units are standard si eg. m/s)
 - `Serial.begin(9600);`
 
 ### Main Parameters
@@ -178,13 +178,13 @@ The `loop()` implements a staged, non-blocking sequence controlled by `DriveStag
 5. **Final Stage**
    - Prints `"Done driving!"` once the sequence is complete.
 
-This file is intended to be used for an autonomous drive-only demonstration.
+This file is intended to be used for the autonomous drive-only demonstration.
 
 ---
 
 ## Launch Mode – `NewShootCode/NewShootCode.ino`
 
-Autonomous “launch” routine that drives to a set distance from a wall/target, then fires a launcher motor.
+Autonomous “launch” routine that drives to a set distance from a wall/target, then fires the launcher.
 
 ### Key Objects
 
@@ -219,7 +219,7 @@ const float shootingAcceptableError = 0.03;  // Allowed error before firing [m]
 
 2. **Stage 1 – PID Initialization**
    - Records the current time.
-   - Calls `Pid.setTarget(shootingT, distance)` to generate the S-curve trajectory to the desired shooting distance.
+   - Calls `Pid.setTarget(shootingT, distance)` to generate the S-curve trajectory to the desired shooting distance from the wall.
    - `ShootStage++`.
 
 3. **Stage 2 – Drive to Shooting Distance**
@@ -242,24 +242,11 @@ const float shootingAcceptableError = 0.03;  // Allowed error before firing [m]
 
 ---
 
-## Building and Uploading
 
-1. Install the Arduino IDE (or compatible environment).
-2. Clone or download this repository.
-3. Open the desired sketch:
-   - Drive mode: open  
-     `NewDrivingCode/newDrivingCode/newDrivingCode.ino`
-   - Launch mode: open  
-     `NewShootCode/NewShootCode.ino`
-4. Ensure `classes.h` remains in the same folder as the `.ino` file you are building.
-5. Select the correct board and port in the Arduino IDE.
-6. Click Upload to flash the code.
-
----
 
 ## Tuning
 
-Several constants can be adjusted for different robots, sensors, or environments:
+Several constants can be adjusted for different conditions and performance.
 
 - Motion profile and PID:
   - In both sketches:
@@ -307,5 +294,3 @@ Use the Arduino Serial Monitor (or another terminal) to observe behaviour and he
 
 - Benjamin McRae (1379397) – primary author of `classes.h`, `MotionMagic7`, L298N wrapper, and both application sketches.
 - Hong Yuet Cheng (1375779) – contributed to the initial design of the `Switch` and `UltrasonicSensor` objects.
-
-All authorship and documentation notes above are taken from the in-code comments.
