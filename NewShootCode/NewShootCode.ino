@@ -1,3 +1,11 @@
+/*
+  This code was created and documented by Benjamin McRae (1379397)
+  between September 28th, 2025 and November 20th, 2025
+  
+*/
+
+
+
 #include "classes.h"//includes the classes header file for all of the objects used
 
 L298N launch(3,7,8);//creates the launcher motor controller, the numbers are the pins, 5:enable, 2:in1, 4:in2
