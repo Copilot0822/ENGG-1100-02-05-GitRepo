@@ -1,6 +1,6 @@
-# ENGG-1100-02-05 – Arduino Drive & Launch Control
+# ENGG-1100-02-05 – Arduino TBWC Codebase
 
-Arduino codebase for an autonomous drive-and-launch system built around an ultrasonic distance sensor, L298N motor drivers, and a custom S-curve motion-profile PID controller (“MotionMagic7”).  
+Arduino codebase for Section 02, Group 05's TBWC built around it's ultrasonic distance sensor, L298N motor drivers, and a custom S-curve motion-profile PID controller (“MotionMagic7”).  
 
 The repository contains two main operating modes:
 
